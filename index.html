@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Attendance Management System</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;background:#fff;border-right:0.5px solid rgba(0,0,0,0.12);display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-header{padding:16px;border-bottom:0.5px solid rgba(0,0,0,0.12)}
+.sidebar-logo{font-size:15px;font-weight:500;color:#1a1a18}
+.sidebar-sub{font-size:11px;color:#888780;margin-top:2px}
+.nav-section{padding:8px 0}
+.nav-label{font-size:10px;font-weight:500;color:#b4b2a9;padding:8px 16px 4px;letter-spacing:.05em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 16px;font-size:13px;color:#5f5e5a;cursor:pointer;transition:.15s}
+.nav-item:hover{background:#f1efe8;color:#1a1a18}
+.nav-item.active{background:#f1efe8;color:#1a1a18;font-weight:500}
+.nav-item i{font-size:15px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:#fff;border-bottom:0.5px solid rgba(0,0,0,0.12);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.page-title{font-size:15px;font-weight:500}
+.role-badge{font-size:11px;padding:3px 8px;border-radius:4px;font-weight:500}
+.role-teacher{background:#E1F5EE;color:#0F6E56}
+.role-admin{background:#EEEDFE;color:#3C3489}
+.btn{padding:6px 12px;font-size:13px;border-radius:8px;border:0.5px solid rgba(0,0,0,0.2);background:#fff;color:#1a1a18;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+.btn:hover{background:#f1efe8}
+.btn-primary{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.btn-primary:hover{background:#0F6E56;border-color:#0F6E56}
+.content{flex:1;overflow-y:auto;padding:20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.metric-card{background:#f1efe8;border-radius:8px;padding:14px 16px}
+.metric-label{font-size:11px;color:#888780;margin-bottom:4px}
+.metric-value{font-size:22px;font-weight:500}
+.metric-sub{font-size:11px;color:#888780;margin-top:2px}
+.card{background:#fff;border:0.5px solid rgba(0,0,0,0.12);border-radius:12px;padding:16px;margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-title{font-size:14px;font-weight:500}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-weight:500;font-size:11px;color:#888780;text-align:left;padding:6px 10px;border-bottom:0.5px solid rgba(0,0,0,0.1);text-transform:uppercase;letter-spacing:.04em}
+td{padding:8px 10px;border-bottom:0.5px solid rgba(0,0,0,0.08);color:#1a1a18}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8f8f6}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 7px;border-radius:4px}
+.badge-present{background:#EAF3DE;color:#3B6D11}
+.badge-absent{background:#FCEBEB;color:#A32D2D}
+.badge-late{background:#FAEEDA;color:#854F0B}
+.att-btn{width:32px;height:32px;border-radius:8px;border:0.5px solid rgba(0,0,0,0.2);background:#f1efe8;cursor:pointer;font-size:11px;font-weight:500;transition:.15s;display:inline-flex;align-items:center;justify-content:center}
+.att-btn:hover{border-color:rgba(0,0,0,0.35)}
+.att-btn.p-sel{background:#1D9E75;color:#fff;border-color:#1D9E75}
+.att-btn.a-sel{background:#E24B4A;color:#fff;border-color:#E24B4A}
+.att-btn.l-sel{background:#EF9F27;color:#fff;border-color:#EF9F27}
+.progress-bar{height:6px;background:#f1efe8;border-radius:3px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;border-radius:3px;transition:.3s}
+.filter-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+select,input{padding:6px 10px;font-size:13px;border-radius:8px;border:0.5px solid rgba(0,0,0,0.2);background:#fff;color:#1a1a18;outline:none}
+select:focus,input:focus{border-color:rgba(0,0,0,0.4)}
+.tab-row{display:flex;gap:0;border-bottom:0.5px solid rgba(0,0,0,0.12);margin-bottom:16px}
+.tab{padding:8px 16px;font-size:13px;cursor:pointer;color:#888780;border-bottom:2px solid transparent;transition:.15s;margin-bottom:-0.5px}
+.tab:hover{color:#1a1a18}
+.tab.active{color:#1D9E75;border-bottom-color:#1D9E75;font-weight:500}
+.heat-cell{width:18px;height:18px;border-radius:3px;display:inline-block;margin:1px;cursor:default}
+.cal-grid{display:flex;flex-wrap:wrap;gap:2px;max-width:520px}
+.avatar{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.alert-card{border-left:3px solid #E24B4A;padding:10px 14px;background:#f8f8f6;border-radius:0 8px 8px 0;margin-bottom:8px;font-size:13px}
+.alert-name{font-weight:500}
+.alert-sub{color:#888780;font-size:12px;margin-top:2px}
+.save-toast{position:fixed;bottom:20px;right:20px;background:#1D9E75;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transition:.3s;pointer-events:none;z-index:99}
+.save-toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div class="save-toast" id="toast">Attendance saved successfully</div>
+
+<script>
+const DATA = {
+  classes: ["CSE-A (3rd yr)","CSE-B (3rd yr)","ECE-A (2nd yr)","MECH-A (1st yr)"],
+  subjects: {
+    "CSE-A (3rd yr)":["Operating Systems","DBMS","Computer Networks","Compiler Design","Machine Learning"],
+    "CSE-B (3rd yr)":["Operating Systems","DBMS","Computer Networks","Software Engineering","AI & ML"],
+    "ECE-A (2nd yr)":["Signals & Systems","Analog Circuits","Digital Electronics","Electromagnetics","Control Systems"],
+    "MECH-A (1st yr)":["Engineering Maths","Engineering Physics","Workshop","Engineering Drawing","Basic Electronics"]
+  },
+  students: {
+    "CSE-A (3rd yr)":[
+      {id:1,name:"Arjun Sharma",roll:"CSA301",avatar:"AS",color:"#1D9E75"},
+      {id:2,name:"Priya Nair",roll:"CSA302",avatar:"PN",color:"#7F77DD"},
+      {id:3,name:"Rohit Verma",roll:"CSA303",avatar:"RV",color:"#378ADD"},
+      {id:4,name:"Sneha Patel",roll:"CSA304",avatar:"SP",color:"#D85A30"},
+      {id:5,name:"Karan Mehta",roll:"CSA305",avatar:"KM",color:"#EF9F27"},
+      {id:6,name:"Ananya Rao",roll:"CSA306",avatar:"AR",color:"#D4537E"},
+      {id:7,name:"Vikram Singh",roll:"CSA307",avatar:"VS",color:"#1D9E75"},
+      {id:8,name:"Deepika Joshi",roll:"CSA308",avatar:"DJ",color:"#7F77DD"}
+    ],
+    "CSE-B (3rd yr)":[
+      {id:9,name:"Rahul Kumar",roll:"CSB301",avatar:"RK",color:"#378ADD"},
+      {id:10,name:"Meera Krishnan",roll:"CSB302",avatar:"MK",color:"#D85A30"},
+      {id:11,name:"Aditya Ghosh",roll:"CSB303",avatar:"AG",color:"#1D9E75"},
+      {id:12,name:"Pooja Desai",roll:"CSB304",avatar:"PD",color:"#7F77DD"},
+      {id:13,name:"Nikhil Reddy",roll:"CSB305",avatar:"NR",color:"#EF9F27"}
+    ],
+    "ECE-A (2nd yr)":[
+      {id:14,name:"Suresh Babu",roll:"ECA201",avatar:"SB",color:"#D4537E"},
+      {id:15,name:"Kavya Menon",roll:"ECA202",avatar:"KM",color:"#1D9E75"},
+      {id:16,name:"Harsh Agarwal",roll:"ECA203",avatar:"HA",color:"#378ADD"},
+      {id:17,name:"Riya Sharma",roll:"ECA204",avatar:"RS",color:"#7F77DD"}
+    ],
+    "MECH-A (1st yr)":[
+      {id:18,name:"Ajay Pandey",roll:"MCA101",avatar:"AP",color:"#D85A30"},
+      {id:19,name:"Tanya Gupta",roll:"MCA102",avatar:"TG",color:"#1D9E75"},
+      {id:20,name:"Siddharth Nair",roll:"MCA103",avatar:"SN",color:"#EF9F27"}
+    ]
+  }
+};
+
+function genAttendance(classKey) {
+  const studs = DATA.students[classKey];
+  const subs = DATA.subjects[classKey];
+  const rec = {};
+  const today = new Date();
+  for(let d=30;d>=1;d--) {
+    const dt = new Date(today); dt.setDate(dt.getDate()-d);
+    const dow = dt.getDay();
+    if(dow===0||dow===6) continue;
+    const dateStr = dt.toISOString().slice(0,10);
+    rec[dateStr] = {};
+    studs.forEach(s => {
+      rec[dateStr][s.id] = {};
+      subs.forEach(sub => {
+        const r = Math.random();
+        rec[dateStr][s.id][sub] = r < 0.78 ? "P" : r < 0.9 ? "A" : "L";
+      });
+    });
+  }
+  return rec;
+}
+
+const attendanceDB = {};
+DATA.classes.forEach(c => { attendanceDB[c] = genAttendance(c); });
+let todayMarked = {};
+
+const app = document.getElementById('app');
+let state = {
+  page: 'mark', role: 'teacher',
+  selClass: DATA.classes[0], selSubject: DATA.subjects[DATA.classes[0]][0],
+  selDate: new Date().toISOString().slice(0,10),
+  reportClass: DATA.classes[0], reportTab: 'classwise',
+  reportSubject: DATA.subjects[DATA.classes[0]][0], selStudentId: null
+};
+
+function getStudentStats(classKey, studentId) {
+  const recs = attendanceDB[classKey];
+  const subs = DATA.subjects[classKey];
+  let total=0,present=0,late=0,absent=0;
+  const subStats = {};
+  subs.forEach(s => subStats[s]={p:0,l:0,a:0,t:0});
+  Object.values(recs).forEach(day => {
+    if(day[studentId]) {
+      subs.forEach(s => {
+        const v = day[studentId][s];
+        if(v) { total++; subStats[s].t++; if(v==="P"){present++;subStats[s].p++} else if(v==="A"){absent++;subStats[s].a++} else{late++;subStats[s].l++} }
+      });
+    }
+  });
+  return {total,present,late,absent,subStats,pct:total?Math.round((present+late)/total*100):0};
+}
+function getClassStats(classKey) {
+  return DATA.students[classKey].map(s => ({...s,...getStudentStats(classKey,s.id)})).sort((a,b)=>a.pct-b.pct);
+}
+
+function toast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+function renderSidebar() {
+  const navs = [
+    {id:'mark',icon:'ti-clipboard-check',label:'Mark Attendance',role:'both'},
+    {id:'dashboard',icon:'ti-layout-dashboard',label:'Dashboard',role:'admin'},
+    {id:'reports',icon:'ti-chart-bar',label:'Reports',role:'both'},
+    {id:'alerts',icon:'ti-alert-triangle',label:'Alerts',role:'both'},
+  ];
+  return `<div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><i class="ti ti-school" style="font-size:16px;margin-right:6px;vertical-align:-2px;color:#1D9E75"></i>AttendTrack</div>
+      <div class="sidebar-sub">Academic Year 2025–26</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Navigation</div>
+      ${navs.filter(n=>n.role==='both'||n.role===state.role).map(n=>`
+        <div class="nav-item ${state.page===n.id?'active':''}" onclick="nav('${n.id}')">
+          <i class="ti ${n.icon}"></i>${n.label}
+        </div>`).join('')}
+    </div>
+    <div style="margin-top:auto;padding:12px 16px;border-top:0.5px solid rgba(0,0,0,0.12)">
+      <div style="font-size:12px;color:#888780;margin-bottom:6px">Logged in as</div>
+      <div style="font-size:13px;font-weight:500">${state.role==='admin'?'Admin':'Prof. Naveen'}</div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn" style="font-size:11px;padding:4px 8px" onclick="toggleRole('teacher')">Teacher</button>
+        <button class="btn" style="font-size:11px;padding:4px 8px" onclick="toggleRole('admin')">Admin</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderMarkPage() {
+  const key = `${state.selClass}||${state.selSubject}||${state.selDate}`;
+  if(!todayMarked[key]) { todayMarked[key]={}; DATA.students[state.selClass].forEach(s=>todayMarked[key][s.id]='P'); }
+  const marks = todayMarked[key];
+  const studs = DATA.students[state.selClass];
+  const pc=Object.values(marks).filter(v=>v==='P').length;
+  const ac=Object.values(marks).filter(v=>v==='A').length;
+  const lc=Object.values(marks).filter(v=>v==='L').length;
+  return `<div>
+    <div class="grid4">
+      <div class="metric-card"><div class="metric-label">Total Students</div><div class="metric-value">${studs.length}</div></div>
+      <div class="metric-card"><div class="metric-label">Present</div><div class="metric-value" style="color:#1D9E75">${pc}</div></div>
+      <div class="metric-card"><div class="metric-label">Absent</div><div class="metric-value" style="color:#E24B4A">${ac}</div></div>
+      <div class="metric-card"><div class="metric-label">Late</div><div class="metric-value" style="color:#EF9F27">${lc}</div></div>
+    </div>
+    <div class="card">
+      <div class="filter-row">
+        <select onchange="setClass(this.value)">${DATA.classes.map(c=>`<option value="${c}" ${c===state.selClass?'selected':''}>${c}</option>`).join('')}</select>
+        <select onchange="setSub(this.value)">${DATA.subjects[state.selClass].map(s=>`<option value="${s}" ${s===state.selSubject?'selected':''}>${s}</option>`).join('')}</select>
+        <input type="date" value="${state.selDate}" onchange="state.selDate=this.value;render()">
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn" onclick="markAll('P')">All Present</button>
+          <button class="btn" onclick="markAll('A')">All Absent</button>
+          <button class="btn btn-primary" onclick="saveAtt()"><i class="ti ti-device-floppy"></i>Save</button>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Roll No.</th><th>Student</th><th style="text-align:center">Present</th><th style="text-align:center">Absent</th><th style="text-align:center">Late</th><th>Status</th><th>Overall %</th></tr></thead>
+        <tbody>
+        ${studs.map(s=>{
+          const st=getStudentStats(state.selClass,s.id);
+          const v=marks[s.id]||'P';
+          return `<tr>
+            <td style="color:#888780">${s.roll}</td>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:${s.color}20;color:${s.color}">${s.avatar}</div>${s.name}</div></td>
+            <td style="text-align:center"><button class="att-btn ${v==='P'?'p-sel':''}" onclick="mark(${s.id},'P')">P</button></td>
+            <td style="text-align:center"><button class="att-btn ${v==='A'?'a-sel':''}" onclick="mark(${s.id},'A')">A</button></td>
+            <td style="text-align:center"><button class="att-btn ${v==='L'?'l-sel':''}" onclick="mark(${s.id},'L')">L</button></td>
+            <td><span class="badge badge-${v==='P'?'present':v==='A'?'absent':'late'}">${v==='P'?'Present':v==='A'?'Absent':'Late'}</span></td>
+            <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;min-width:28px">${st.pct}%</span><div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:${st.pct}%;background:${st.pct>=75?'#1D9E75':st.pct>=60?'#EF9F27':'#E24B4A'}"></div></div></div></td>
+          </tr>`;}).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderDashboard() {
+  let allStats = [];
+  DATA.classes.forEach(c => { getClassStats(c).forEach(s => allStats.push({...s,className:c})); });
+  allStats.sort((a,b)=>a.pct-b.pct);
+  const critical = allStats.filter(s=>s.pct<75);
+  const avgAll = Math.round(allStats.reduce((a,b)=>a+b.pct,0)/allStats.length);
+  const classAvgs = DATA.classes.map(c => { const cs=getClassStats(c); return {name:c,avg:Math.round(cs.reduce((a,b)=>a+b.pct,0)/cs.length)}; });
+  return `<div>
+    <div class="grid4">
+      <div class="metric-card"><div class="metric-label">Total Students</div><div class="metric-value">${allStats.length}</div></div>
+      <div class="metric-card"><div class="metric-label">Overall Attendance</div><div class="metric-value" style="color:#1D9E75">${avgAll}%</div></div>
+      <div class="metric-card"><div class="metric-label">Below 75%</div><div class="metric-value" style="color:#E24B4A">${critical.length}</div></div>
+      <div class="metric-card"><div class="metric-label">Classes</div><div class="metric-value">${DATA.classes.length}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Class Performance</span></div>
+        ${classAvgs.map(c=>`<div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+            <span>${c.name}</span><span style="font-weight:500;color:${c.avg>=75?'#1D9E75':c.avg>=60?'#EF9F27':'#E24B4A'}">${c.avg}%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${c.avg}%;background:${c.avg>=75?'#1D9E75':c.avg>=60?'#EF9F27':'#E24B4A'}"></div></div>
+        </div>`).join('')}
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Critical Alerts (Below 75%)</span></div>
+        <div style="max-height:220px;overflow-y:auto">
+        ${critical.length===0?'<div style="color:#888780;font-size:13px">No critical cases</div>':critical.slice(0,6).map(s=>`
+          <div class="alert-card">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="avatar" style="background:${s.color}20;color:${s.color}">${s.avatar}</div>
+              <div><div class="alert-name">${s.name}</div><div class="alert-sub">${s.className} · ${s.pct}%</div></div>
+              <span class="badge badge-absent" style="margin-left:auto">${s.pct}%</span>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:0">
+      <div class="card-header"><span class="card-title">All Students Overview</span></div>
+      <table>
+        <thead><tr><th>Student</th><th>Class</th><th>Present</th><th>Absent</th><th>Late</th><th>Attendance %</th><th>Status</th></tr></thead>
+        <tbody>
+        ${allStats.map(s=>`<tr>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:${s.color}20;color:${s.color};width:24px;height:24px;font-size:10px">${s.avatar}</div>${s.name}</div></td>
+          <td style="color:#888780;font-size:12px">${s.className}</td>
+          <td>${s.present}</td><td>${s.absent}</td><td>${s.late}</td>
+          <td><div style="display:flex;align-items:center;gap:6px"><span style="font-weight:500;color:${s.pct>=75?'#1D9E75':s.pct>=60?'#EF9F27':'#E24B4A'}">${s.pct}%</span><div class="progress-bar" style="flex:1;min-width:60px"><div class="progress-fill" style="width:${s.pct}%;background:${s.pct>=75?'#1D9E75':s.pct>=60?'#EF9F27':'#E24B4A'}"></div></div></div></td>
+          <td><span class="badge ${s.pct>=75?'badge-present':s.pct>=60?'badge-late':'badge-absent'}">${s.pct>=75?'Good':s.pct>=60?'Warning':'Critical'}</span></td>
+        </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderReports() {
+  return `<div>
+    <div class="tab-row">
+      <div class="tab ${state.reportTab==='classwise'?'active':''}" onclick="state.reportTab='classwise';render()">Class-wise Report</div>
+      <div class="tab ${state.reportTab==='studentwise'?'active':''}" onclick="state.reportTab='studentwise';render()">Student-wise Report</div>
+      <div class="tab ${state.reportTab==='subjectwise'?'active':''}" onclick="state.reportTab='subjectwise';render()">Subject-wise Report</div>
+    </div>
+    ${state.reportTab==='classwise'?renderClassReport():state.reportTab==='studentwise'?renderStudentReport():renderSubjectReport()}
+  </div>`;
+}
+
+function renderClassReport() {
+  const stats = getClassStats(state.reportClass);
+  const avg = Math.round(stats.reduce((a,b)=>a+b.pct,0)/stats.length);
+  return `<div>
+    <div class="filter-row">
+      <select onchange="state.reportClass=this.value;render()">${DATA.classes.map(c=>`<option value="${c}" ${c===state.reportClass?'selected':''}>${c}</option>`).join('')}</select>
+    </div>
+    <div class="grid4">
+      <div class="metric-card"><div class="metric-label">Students</div><div class="metric-value">${stats.length}</div></div>
+      <div class="metric-card"><div class="metric-label">Class Average</div><div class="metric-value" style="color:#1D9E75">${avg}%</div></div>
+      <div class="metric-card"><div class="metric-label">Above 75%</div><div class="metric-value" style="color:#1D9E75">${stats.filter(s=>s.pct>=75).length}</div></div>
+      <div class="metric-card"><div class="metric-label">Below 75%</div><div class="metric-value" style="color:#E24B4A">${stats.filter(s=>s.pct<75).length}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">${state.reportClass} — Attendance Report</span></div>
+      <table>
+        <thead><tr><th>Roll No.</th><th>Student</th><th>Total</th><th>Present</th><th>Absent</th><th>Late</th><th>Attendance %</th><th>Status</th></tr></thead>
+        <tbody>
+        ${stats.map(s=>`<tr>
+          <td style="color:#888780">${s.roll}</td>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:${s.color}20;color:${s.color}">${s.avatar}</div>${s.name}</div></td>
+          <td>${s.total}</td><td>${s.present}</td><td>${s.absent}</td><td>${s.late}</td>
+          <td><div style="display:flex;align-items:center;gap:6px"><b style="color:${s.pct>=75?'#1D9E75':s.pct>=60?'#EF9F27':'#E24B4A'}">${s.pct}%</b><div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:${s.pct}%;background:${s.pct>=75?'#1D9E75':s.pct>=60?'#EF9F27':'#E24B4A'}"></div></div></div></td>
+          <td><span class="badge ${s.pct>=75?'badge-present':s.pct>=60?'badge-late':'badge-absent'}">${s.pct>=75?'Good':s.pct>=60?'Warning':'Critical'}</span></td>
+        </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderStudentReport() {
+  const studs = DATA.students[state.reportClass];
+  const selId = state.selStudentId||studs[0].id;
+  const st = getStudentStats(state.reportClass, selId);
+  const subs = DATA.subjects[state.reportClass];
+  const recs = attendanceDB[state.reportClass];
+  const dates = Object.keys(recs).sort();
+  return `<div>
+    <div class="filter-row">
+      <select onchange="state.reportClass=this.value;state.selStudentId=null;render()">${DATA.classes.map(c=>`<option value="${c}" ${c===state.reportClass?'selected':''}>${c}</option>`).join('')}</select>
+      <select onchange="state.selStudentId=parseInt(this.value);render()">${studs.map(s=>`<option value="${s.id}" ${s.id===selId?'selected':''}>${s.name}</option>`).join('')}</select>
+    </div>
+    <div class="grid4">
+      <div class="metric-card"><div class="metric-label">Overall %</div><div class="metric-value" style="color:${st.pct>=75?'#1D9E75':st.pct>=60?'#EF9F27':'#E24B4A'}">${st.pct}%</div></div>
+      <div class="metric-card"><div class="metric-label">Present Days</div><div class="metric-value" style="color:#1D9E75">${st.present}</div></div>
+      <div class="metric-card"><div class="metric-label">Absent Days</div><div class="metric-value" style="color:#E24B4A">${st.absent}</div></div>
+      <div class="metric-card"><div class="metric-label">Late Days</div><div class="metric-value" style="color:#EF9F27">${st.late}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Subject-wise Breakdown</span></div>
+        ${subs.map(sub=>{const ss=st.subStats[sub];const p=ss.t?Math.round((ss.p+ss.l)/ss.t*100):0;return `<div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+            <span style="color:#888780">${sub}</span>
+            <span style="font-weight:500;color:${p>=75?'#1D9E75':p>=60?'#EF9F27':'#E24B4A'}">${p}% (${ss.p+ss.l}/${ss.t})</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${p}%;background:${p>=75?'#1D9E75':p>=60?'#EF9F27':'#E24B4A'}"></div></div>
+        </div>`;}).join('')}
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Attendance Calendar (Last 30 Days)</span></div>
+        <div style="font-size:11px;color:#888780;margin-bottom:8px">Per day, across all subjects</div>
+        <div class="cal-grid">
+          ${dates.map(d=>{const dr=recs[d];if(!dr[selId]) return '';const vals=Object.values(dr[selId]);const allA=vals.every(v=>v==='A');const allP=vals.every(v=>v==='P');const bg=allA?'#F09595':allP?'#97C459':'#FAC775';return `<div class="heat-cell" style="background:${bg}" title="${d}"></div>`;}).join('')}
+        </div>
+        <div style="display:flex;gap:12px;margin-top:10px;font-size:11px;color:#888780">
+          <span><span style="display:inline-block;width:10px;height:10px;background:#97C459;border-radius:2px;margin-right:4px"></span>Present</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:#F09595;border-radius:2px;margin-right:4px"></span>Absent</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:#FAC775;border-radius:2px;margin-right:4px"></span>Mixed</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSubjectReport() {
+  const subs = DATA.subjects[state.reportClass];
+  const studs = DATA.students[state.reportClass];
+  const recs = attendanceDB[state.reportClass];
+  const subData = subs.map(sub => {
+    let total=0,present=0,absent=0,late=0;
+    Object.values(recs).forEach(day => { studs.forEach(s => { if(day[s.id]&&day[s.id][sub]) { total++; if(day[s.id][sub]==='P') present++; else if(day[s.id][sub]==='A') absent++; else late++; } }); });
+    return {sub,total,present,absent,late,pct:total?Math.round((present+late)/total*100):0};
+  });
+  return `<div>
+    <div class="filter-row">
+      <select onchange="state.reportClass=this.value;render()">${DATA.classes.map(c=>`<option value="${c}" ${c===state.reportClass?'selected':''}>${c}</option>`).join('')}</select>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Subject-wise Attendance — ${state.reportClass}</span></div>
+      <table>
+        <thead><tr><th>Subject</th><th>Total Sessions</th><th>Present</th><th>Absent</th><th>Late</th><th>Avg %</th></tr></thead>
+        <tbody>
+        ${subData.map(s=>`<tr>
+          <td style="font-weight:500">${s.sub}</td>
+          <td>${s.total}</td><td style="color:#1D9E75">${s.present}</td><td style="color:#E24B4A">${s.absent}</td><td style="color:#EF9F27">${s.late}</td>
+          <td><div style="display:flex;align-items:center;gap:8px"><b style="color:${s.pct>=75?'#1D9E75':s.pct>=60?'#EF9F27':'#E24B4A'};min-width:32px">${s.pct}%</b><div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:${s.pct}%;background:${s.pct>=75?'#1D9E75':s.pct>=60?'#EF9F27':'#E24B4A'}"></div></div></div></td>
+        </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderAlerts() {
+  let all = [];
+  DATA.classes.forEach(c => { getClassStats(c).forEach(s => all.push({...s,className:c})); });
+  all.sort((a,b)=>a.pct-b.pct);
+  const critical = all.filter(s=>s.pct<75);
+  const warning = all.filter(s=>s.pct>=75&&s.pct<85);
+  return `<div>
+    <div class="grid2">
+      <div class="metric-card"><div class="metric-label">Critical (Below 75%)</div><div class="metric-value" style="color:#E24B4A">${critical.length}</div><div class="metric-sub">Requires immediate action</div></div>
+      <div class="metric-card"><div class="metric-label">Warning (75–85%)</div><div class="metric-value" style="color:#EF9F27">${warning.length}</div><div class="metric-sub">Needs monitoring</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-header"><span class="card-title" style="color:#E24B4A"><i class="ti ti-alert-circle" style="margin-right:6px;font-size:14px"></i>Critical — Below 75%</span></div>
+        ${critical.length===0?'<div style="color:#888780;font-size:13px">No critical cases</div>':critical.map(s=>`
+          <div class="alert-card">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="avatar" style="background:${s.color}20;color:${s.color}">${s.avatar}</div>
+              <div style="flex:1"><div class="alert-name">${s.name} <span style="font-size:11px;color:#888780">${s.roll}</span></div><div class="alert-sub">${s.className} · ${s.absent} absent days</div></div>
+              <span class="badge badge-absent">${s.pct}%</span>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title" style="color:#EF9F27"><i class="ti ti-alert-triangle" style="margin-right:6px;font-size:14px"></i>Warning — 75–85%</span></div>
+        ${warning.length===0?'<div style="color:#888780;font-size:13px">No warning cases</div>':warning.map(s=>`
+          <div class="alert-card" style="border-left-color:#EF9F27">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="avatar" style="background:${s.color}20;color:${s.color}">${s.avatar}</div>
+              <div style="flex:1"><div class="alert-name">${s.name} <span style="font-size:11px;color:#888780">${s.roll}</span></div><div class="alert-sub">${s.className}</div></div>
+              <span class="badge badge-late">${s.pct}%</span>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+const pageTitles = {mark:'Mark Attendance',dashboard:'Admin Dashboard',reports:'Attendance Reports',alerts:'Absenteeism Alerts'};
+
+function render() {
+  const content = state.page==='mark'?renderMarkPage():state.page==='dashboard'?renderDashboard():state.page==='reports'?renderReports():renderAlerts();
+  app.innerHTML = `${renderSidebar()}<div class="main">
+    <div class="topbar">
+      <span class="page-title">${pageTitles[state.page]}</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="role-badge ${state.role==='admin'?'role-admin':'role-teacher'}">${state.role==='admin'?'Admin View':'Teacher View'}</span>
+      </div>
+    </div>
+    <div class="content">${content}</div>
+  </div>`;
+}
+
+window.nav = (p) => { state.page=p; render(); };
+window.toggleRole = (r) => { state.role=r; if(r==='teacher'&&state.page==='dashboard') state.page='mark'; render(); };
+window.setClass = (v) => { state.selClass=v; state.selSubject=DATA.subjects[v][0]; render(); };
+window.setSub = (v) => { state.selSubject=v; render(); };
+window.mark = (id, val) => { const key=`${state.selClass}||${state.selSubject}||${state.selDate}`; if(!todayMarked[key]) todayMarked[key]={}; todayMarked[key][id]=val; render(); };
+window.markAll = (val) => { const key=`${state.selClass}||${state.selSubject}||${state.selDate}`; if(!todayMarked[key]) todayMarked[key]={}; DATA.students[state.selClass].forEach(s=>todayMarked[key][s.id]=val); render(); };
+window.saveAtt = () => { toast(); };
+
+render();
+</script>
+</body>
+</html>
