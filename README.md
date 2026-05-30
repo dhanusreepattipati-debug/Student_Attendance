@@ -62,3 +62,52 @@ It allows teachers and admins to mark attendance, analyze reports, and monitor s
 ---
 
 ## 📂 Project Structure
+student-attendance-system/
+│
+├── index.html
+├── README.md
+
+
+---
+
+## ▶️ How to Run
+
+### Option 1
+- Download project
+- Open `index.html` in browser
+
+### Option 2 (Recommended)
+- Open in VS Code
+- Install Live Server extension
+- Right-click → Open with Live Server
+
+---
+
+## 📊 How It Works
+
+- Attendance stored in JavaScript object (`attendanceDB`)
+- Random demo data generated for last 30 days
+- UI updates dynamically without refresh
+- State handled using pure JavaScript
+
+---
+
+## 🎯 Highlights
+
+- No backend required
+- Fully interactive UI
+- Real-time updates
+- Clean dashboard design
+- College project ready
+
+---
+
+## 📌 Future Improvements
+
+- Backend (Node.js / Firebase)
+- Login system
+- PDF/Excel export
+- Database integration (MongoDB)
+- Mobile responsiveness
+
+---
